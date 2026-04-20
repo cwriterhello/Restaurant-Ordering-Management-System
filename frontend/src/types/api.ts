@@ -78,6 +78,16 @@ export interface Combo {
   updateTime: string
 }
 
+// 套餐视图对象
+export interface ComboVO extends Combo {
+  dishes?: Array<{
+    dishId: number
+    dishName: string
+    price: number
+    quantity: number
+  }>
+}
+
 // 订单相关
 export interface OrderVO {
   id: number

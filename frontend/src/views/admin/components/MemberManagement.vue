@@ -4,6 +4,7 @@
       <template #header>
         <div class="card-header">
           <span>会员管理</span>
+          <el-button type="primary" @click="handleAdd">新增会员</el-button>
         </div>
       </template>
       
@@ -51,15 +52,19 @@
       </el-table>
     </el-card>
     
-    <!-- 编辑会员对话框 -->
+    <!-- 新增/编辑会员对话框 -->
     <el-dialog
       v-model="showDialog"
-      title="编辑会员"
+      :title="isEdit ? '编辑会员' : '新增会员'"
       width="500px"
     >
       <el-form :model="memberForm" :rules="memberRules" ref="memberFormRef" label-width="100px">
         <el-form-item label="手机号" prop="phone">
-          <el-input v-model="memberForm.phone" disabled />
+          <el-input 
+            v-model="memberForm.phone" 
+            :disabled="isEdit"
+            placeholder="请输入手机号" 
+          />
         </el-form-item>
         <el-form-item label="姓名" prop="name">
           <el-input v-model="memberForm.name" placeholder="请输入姓名" />
@@ -98,7 +103,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { getMembersApi, updateMemberApi } from '@/api/member'
+import { getMembersApi, updateMemberApi, createMemberApi } from '@/api/member'
 import type { Member } from '@/types/api'
 
 const allMembers = ref<Member[]>([])
@@ -109,6 +114,7 @@ const searchForm = reactive({
 })
 
 const showDialog = ref(false)
+const isEdit = ref(false)
 const saving = ref(false)
 const memberFormRef = ref<FormInstance>()
 
@@ -121,6 +127,10 @@ const memberForm = reactive<Partial<Member>>({
 })
 
 const memberRules = reactive<FormRules<Partial<Member>>>({
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+  ],
   name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
   level: [{ required: true, message: '请选择会员等级', trigger: 'change' }],
   discount: [{ required: true, message: '请输入折扣', trigger: 'blur' }]
@@ -155,7 +165,20 @@ const resetSearch = () => {
   searchForm.phone = ''
 }
 
+const handleAdd = () => {
+  isEdit.value = false
+  Object.assign(memberForm, {
+    id: 0,
+    phone: '',
+    name: '',
+    level: 'NORMAL',
+    discount: 1.0
+  })
+  showDialog.value = true
+}
+
 const handleEdit = (member: Member) => {
+  isEdit.value = true
   Object.assign(memberForm, member)
   memberForm.discount = Number(member.discount)
   showDialog.value = true
@@ -168,17 +191,29 @@ const handleSave = async () => {
     await memberFormRef.value.validate()
     saving.value = true
     
-    await updateMemberApi(memberForm.id!, {
-      name: memberForm.name,
-      level: memberForm.level,
-      discount: memberForm.discount ? memberForm.discount.toString() : undefined
-    })
+    if (isEdit.value) {
+      // 编辑会员
+      await updateMemberApi(memberForm.id!, {
+        name: memberForm.name,
+        level: memberForm.level,
+        discount: memberForm.discount ? memberForm.discount.toString() : undefined
+      })
+      ElMessage.success('会员信息更新成功')
+    } else {
+      // 新增会员
+      await createMemberApi({
+        phone: memberForm.phone!,
+        name: memberForm.name,
+        level: memberForm.level,
+        discount: memberForm.discount
+      })
+      ElMessage.success('会员创建成功')
+    }
     
-    ElMessage.success('会员信息更新成功')
     showDialog.value = false
     await loadMembers() // 重新加载会员列表
   } catch (error: any) {
-    ElMessage.error(error.message || '更新失败')
+    ElMessage.error(error.message || '操作失败')
   } finally {
     saving.value = false
   }

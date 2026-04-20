@@ -24,7 +24,7 @@ const routes = [
     path: '/kitchen',
     name: 'Kitchen',
     component: () => import('@/views/kitchen/Index.vue'),
-    meta: { requiresAuth: true, roles: ['KITCHEN'] }
+    meta: { requiresAuth: true, roles: ['KITCHEN', 'ADMIN'] }
   },
   {
     path: '/cashier',

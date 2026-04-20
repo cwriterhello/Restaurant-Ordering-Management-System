@@ -40,12 +40,37 @@ public class MemberController {
     }
     
     @PostMapping
-    public ApiResponse<Member> createMember(
-            @RequestParam String phone,
-            @RequestParam(required = false) String name) {
+    public ApiResponse<Member> createMember(@RequestBody Member member) {
         try {
-            Member member = memberService.createMember(phone, name);
-            return ApiResponse.success("会员创建成功", member);
+            // 验证必填字段
+            if (member.getPhone() == null || member.getPhone().trim().isEmpty()) {
+                return ApiResponse.error("手机号不能为空");
+            }
+            
+            // 设置默认值
+            if (member.getLevel() == null || member.getLevel().trim().isEmpty()) {
+                member.setLevel("NORMAL");
+            }
+            if (member.getDiscount() == null) {
+                member.setDiscount(new java.math.BigDecimal("1.00"));
+            }
+            if (member.getName() == null) {
+                member.setName("");
+            }
+            
+            Member createdMember = memberService.createMember(
+                member.getPhone(), 
+                member.getName()
+            );
+            
+            // 如果传入了等级和折扣，更新这些信息
+            if (!"NORMAL".equals(member.getLevel()) || member.getDiscount().compareTo(new java.math.BigDecimal("1.00")) != 0) {
+                createdMember.setLevel(member.getLevel());
+                createdMember.setDiscount(member.getDiscount());
+                createdMember = memberService.updateMember(createdMember);
+            }
+            
+            return ApiResponse.success("会员创建成功", createdMember);
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage());
         }

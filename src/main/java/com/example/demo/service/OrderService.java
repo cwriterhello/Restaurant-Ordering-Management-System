@@ -179,7 +179,8 @@ public class OrderService {
         
         return convertToVO(order);
     }
-    
+
+
     private String generateOrderNumber() {
         return "ORD" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + 
                String.format("%04d", (int)(Math.random() * 10000));

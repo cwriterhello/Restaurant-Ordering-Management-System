@@ -3,7 +3,10 @@ C:\dev\aaa\demo\src\main\java\com\example\demo\config\DataInitializer.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\GlobalExceptionHandler.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\MyBatisPlusConfig.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\MyMetaObjectHandler.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\config\OpenApiConfig.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\config\RedisConfig.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\SecurityConfig.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\config\WebConfig.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\WebSocketConfig.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\AuthController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\CategoryController.java
@@ -13,8 +16,10 @@ C:\dev\aaa\demo\src\main\java\com\example\demo\controller\MemberController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\OrderController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\StatisticsController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\TableController.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\controller\UserController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\DemoApplication.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\ApiResponse.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\dto\ComboAndDishesRequest.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\ComboDishConfigDTO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\CreateOrderRequest.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\DishDTO.java
@@ -51,6 +56,8 @@ C:\dev\aaa\demo\src\main\java\com\example\demo\service\ComboService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\DishService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\MemberService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\OrderService.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\service\RedisService.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\service\UserService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\WebSocketService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\util\BeanUtil.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\util\JwtUtil.java

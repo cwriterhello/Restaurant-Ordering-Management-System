@@ -10,9 +10,17 @@ export const getComboByIdApi = (id: number): Promise<ApiResponse<Combo>> => {
   return request.get(`/combos/${id}`)
 }
 
-export const createComboApi = (data: Combo): Promise<ApiResponse<Combo>> => {
+export const createComboApi = (data: {
+  combo: Combo,
+  dishesConfig: ComboDishConfig
+}): Promise<ApiResponse<ComboVO>> => {
   return request.post('/combos', data)
 }
+
+  // getCombosWithDishesApi 已被弃用，使用 getComboByIdApi 替代
+  // export const getCombosWithDishesApi = (id: number): Promise<ApiResponse<ComboVO>> => {
+  //   return request.get(`/combos/${id}`)
+  // }
 
 export const updateComboApi = (id: number, data: Combo): Promise<ApiResponse<Combo>> => {
   return request.put(`/combos/${id}`, data)
@@ -36,6 +44,6 @@ export interface ComboDishConfig {
   }[]
 }
 
-export const configureComboDishesApi = (comboId: number, config: ComboDishConfig): Promise<ApiResponse> => {
+export const configureComboDishesApi = (comboId: string | number, config: ComboDishConfig): Promise<ApiResponse> => {
   return request.post(`/combos/${comboId}/dishes`, config)
 }

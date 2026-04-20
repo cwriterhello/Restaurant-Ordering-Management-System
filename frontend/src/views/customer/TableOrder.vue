@@ -16,7 +16,58 @@
       </el-header>
       
       <el-main v-if="tableValidated">
+        <!-- 当前订单状态显示 -->
+        <div v-if="currentOrderId !== null" class="order-status">
+          <el-alert
+            title="订单处理中"
+            type="info"
+            description="您的订单正在处理中，请等待服务员上菜。"
+            :closable="false"
+            show-icon
+          />
+        </div>
+        
         <el-tabs v-model="activeCategory" @tab-change="handleCategoryChange">
+          <!-- 所有菜品标签页 -->
+          <el-tab-pane label="所有菜品" name="all">
+            <div class="dish-grid">
+              <el-card
+                v-for="dish in allDishes"
+                :key="dish.id"
+                class="dish-card"
+                :class="{ 'out-of-stock': dish.stock === 0 || dish.isAvailable === 0 }"
+                @click="handleDishClick(dish)"
+              >
+                <div class="dish-image">
+                  <el-image
+                    :src="dish.image || '/placeholder.png'"
+                    fit="cover"
+                    style="width: 100%; height: 150px"
+                  >
+                    <template #error>
+                      <div class="image-slot">暂无图片</div>
+                    </template>
+                  </el-image>
+                  <el-tag v-if="dish.isRecommend === 1" type="danger" class="recommend-tag">推荐</el-tag>
+                </div>
+                <div class="dish-info">
+                  <h3>{{ dish.name }}</h3>
+                  <p class="dish-desc">{{ dish.description }}</p>
+                  <div class="dish-footer">
+                    <span class="dish-price">¥{{ dish.price }}</span>
+                    <el-button
+                      type="primary"
+                      size="small"
+                      :disabled="dish.stock === 0 || dish.isAvailable === 0"
+                      @click.stop="addToCart(dish)"
+                    >
+                      加入购物车
+                    </el-button>
+                  </div>
+                </div>
+              </el-card>
+            </div>
+          </el-tab-pane>
           <el-tab-pane
             v-for="category in categories"
             :key="category.id"
@@ -230,7 +281,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, ShoppingCart } from '@element-plus/icons-vue'
 import { useCartStore } from '@/stores/cart'
 import { getCategoriesApi } from '@/api/category'
-import { getDishesByCategoryApi } from '@/api/dish'
+import { getDishesApi, getDishesByCategoryApi } from '@/api/dish'
 import { getCombosApi } from '@/api/combo'
 import { createOrderApi } from '@/api/order'
 import { validateTableNumberApi } from '@/api/table'
@@ -263,8 +314,9 @@ const validateTable = async () => {
 
 const categories = ref<Category[]>([])
 const dishes = ref<DishVO[]>([])
+const allDishes = ref<DishVO[]>([])
 const combos = ref<Combo[]>([])
-const activeCategory = ref('combo') // 默认显示套餐
+const activeCategory = ref('all') // 默认显示所有菜品
 const showCart = ref(false)
 const showOrderDialog = ref(false)
 const submitting = ref(false)
@@ -282,6 +334,7 @@ onMounted(async () => {
     tableValidated.value = true // 设置验证状态为true
     await loadCategories()
     await loadCombos() // 加载套餐
+    await loadAllDishes() // 加载所有菜品
   } else {
     tableValidated.value = false // 设置验证状态为false
   }
@@ -291,8 +344,8 @@ const loadCategories = async () => {
   try {
     const res = await getCategoriesApi()
     categories.value = res.data
-    if (categories.value.length > 0) {
-      activeCategory.value = categories.value[0].id.toString()
+    if (categories.value.length > 0 && activeCategory.value === categories.value[0].id.toString()) {
+      // 只有当当前激活的分类是第一个分类时才加载
       await loadDishes(Number(activeCategory.value))
     }
   } catch (error) {
@@ -310,8 +363,19 @@ const loadCombos = async () => {
 }
 
 const handleCategoryChange = async (categoryId: string) => {
-  if (categoryId !== 'combo') {
+  if (categoryId === 'all') {
+    await loadAllDishes()
+  } else if (categoryId !== 'combo') {
     await loadDishes(Number(categoryId))
+  }
+}
+
+const loadAllDishes = async () => {
+  try {
+    const res = await getDishesApi()
+    allDishes.value = res.data
+  } catch (error) {
+    ElMessage.error('加载所有菜品失败')
   }
 }
 
@@ -320,7 +384,7 @@ const loadDishes = async (categoryId: number) => {
     const res = await getDishesByCategoryApi(categoryId)
     dishes.value = res.data
   } catch (error) {
-    ElMessage.error('加载菜品失败')
+    ElMessage.error('加载分类菜品失败')
   }
 }
 
@@ -366,6 +430,9 @@ const handleSubmitOrder = () => {
   showOrderDialog.value = true
 }
 
+// 当前订单ID
+const currentOrderId = ref<number | null>(null)
+    
 const submitOrder = async () => {
   submitting.value = true
   try {
@@ -377,7 +444,10 @@ const submitOrder = async () => {
     })
 
     const order: OrderVO = res.data
-
+        
+    // 保存当前订单ID
+    currentOrderId.value = order.id
+        
     ElMessage.success(`订单提交成功！订单号：${order.orderNumber}`)
     cartStore.clearCart()
     showOrderDialog.value = false
@@ -385,7 +455,13 @@ const submitOrder = async () => {
 
     // 订阅该订单的状态变更
     connectOrderStatusWebSocket(order.id, (updated: OrderVO) => {
-      if (updated.status === 'READY') {
+      if (updated.status === 'PENDING') {
+        ElMessage.info('订单已接收，正在处理中')
+      } else if (updated.status === 'CONFIRMED') {
+        ElMessage.info('订单已确认，开始备餐')
+      } else if (updated.status === 'PREPARING') {
+        ElMessage.info('正在为您准备菜品')
+      } else if (updated.status === 'READY') {
         ElMessageBox.alert(
           `您的订单【${updated.orderNumber}】已完成，请前往前台结账或等待服务员上菜。`,
           '订单完成',
@@ -394,6 +470,8 @@ const submitOrder = async () => {
             type: 'success'
           }
         )
+        // 清除当前订单ID
+        currentOrderId.value = null
       }
     })
   } catch (error: any) {
@@ -576,6 +654,10 @@ onUnmounted(() => {
   font-size: 20px;
   font-weight: bold;
   color: #f56c6c;
+}
+
+.order-status {
+  margin-bottom: 20px;
 }
 
 .loading-container {

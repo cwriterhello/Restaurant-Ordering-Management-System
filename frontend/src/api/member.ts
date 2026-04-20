@@ -9,8 +9,13 @@ export const getMembersApi = (): Promise<ApiResponse<Member[]>> => {
   return request.get('/members')
 }
 
-export const createMemberApi = (phone: string, name?: string): Promise<ApiResponse<Member>> => {
-  return request.post('/members', null, { params: { phone, name } })
+export const createMemberApi = (data: {
+  phone: string
+  name?: string
+  level?: string
+  discount?: number
+}): Promise<ApiResponse<Member>> => {
+  return request.post('/members', data)
 }
 
 export const updateMemberApi = (
