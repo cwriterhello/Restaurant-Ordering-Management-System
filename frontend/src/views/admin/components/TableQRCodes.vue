@@ -103,7 +103,7 @@ onMounted(() => {
 
 <style scoped>
 .table-qrs {
-  padding: 20px;
+  padding: 8px 0 0;
 }
 
 .card-header {
@@ -115,12 +115,13 @@ onMounted(() => {
 .qr-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  gap: 14px;
   margin-top: 10px;
 }
 
 .qr-card {
   text-align: center;
+  border-radius: 14px;
 }
 
 .qr-header {
@@ -140,7 +141,7 @@ onMounted(() => {
 
 .url {
   font-size: 12px;
-  color: #909399;
+  color: #6e7c80;
   word-break: break-all;
   margin-bottom: 6px;
 }

@@ -101,14 +101,15 @@ const handleCreate = async () => {
     return
   }
   
+  const createdPhone = createForm.phone.trim()
   creating.value = true
   try {
-    await createMemberApi(createForm.phone, createForm.name || undefined)
+    await createMemberApi(createdPhone, createForm.name || undefined)
     ElMessage.success('会员创建成功')
     showCreateDialog.value = false
     createForm.phone = ''
     createForm.name = ''
-    searchForm.phone = createForm.phone
+    searchForm.phone = createdPhone
     await handleSearch()
   } catch (error: any) {
     ElMessage.error(error.message || '创建失败')
@@ -130,7 +131,7 @@ const getLevelText = (level: string) => {
 
 <style scoped>
 .member-management {
-  padding: 20px;
+  padding: 8px 0 0;
 }
 
 .card-header {
@@ -140,7 +141,8 @@ const getLevelText = (level: string) => {
 }
 
 .member-info {
-  margin-top: 20px;
+  margin-top: 16px;
+  border-radius: 14px;
 }
 
 .member-info h3 {

@@ -246,7 +246,7 @@ onMounted(() => {
 
 <style scoped>
 .member-management {
-  padding: 20px;
+  padding: 8px 0 0;
 }
 
 .card-header {

@@ -2,9 +2,12 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.CreateOrderRequest;
+import com.example.demo.dto.OnlinePaymentConfirmDTO;
 import com.example.demo.dto.OrderStatusUpdateDTO;
 import com.example.demo.dto.PaymentDTO;
 import com.example.demo.service.OrderService;
+import com.example.demo.vo.OnlinePaymentStatusVO;
+import com.example.demo.vo.OnlinePaymentVO;
 import com.example.demo.vo.OrderVO;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +80,43 @@ public class OrderController {
         try {
             OrderVO order = orderService.payOrder(id, paymentDTO);
             return ApiResponse.success("支付成功", order);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/online-payment")
+    public ApiResponse<OnlinePaymentVO> createOnlinePayment(
+            @PathVariable Long id,
+            @Valid @RequestBody PaymentDTO paymentDTO) {
+        try {
+            OnlinePaymentVO onlinePayment = orderService.createOnlinePayment(id, paymentDTO);
+            return ApiResponse.success("在线支付单创建成功", onlinePayment);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/online-payment/{paymentNo}")
+    public ApiResponse<OnlinePaymentStatusVO> getOnlinePaymentStatus(
+            @PathVariable Long id,
+            @PathVariable String paymentNo) {
+        try {
+            OnlinePaymentStatusVO paymentStatus = orderService.getOnlinePaymentStatus(id, paymentNo);
+            return ApiResponse.success(paymentStatus);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/online-payment/{paymentNo}/confirm")
+    public ApiResponse<OrderVO> confirmOnlinePayment(
+            @PathVariable Long id,
+            @PathVariable String paymentNo,
+            @RequestBody(required = false) OnlinePaymentConfirmDTO confirmDTO) {
+        try {
+            OrderVO order = orderService.confirmOnlinePayment(id, paymentNo, confirmDTO);
+            return ApiResponse.success("在线支付确认成功", order);
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage());
         }

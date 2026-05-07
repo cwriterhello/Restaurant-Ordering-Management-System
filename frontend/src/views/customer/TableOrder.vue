@@ -1,9 +1,10 @@
 <template>
-  <div class="table-order">
-    <el-container>
-      <el-header class="order-header">
+  <div class="app-page table-order">
+    <div class="app-shell">
+      <header class="app-header order-header">
         <div class="header-left">
-          <h2>桌号：{{ tableNumber }}</h2>
+          <h2 class="app-title">桌号 {{ tableNumber }}</h2>
+          <p class="app-subtitle">可按分类浏览菜品并快速提交订单</p>
         </div>
         <div class="header-right">
           <el-badge :value="cartStore.getTotalCount()" :hidden="cartStore.getTotalCount() === 0">
@@ -13,10 +14,9 @@
             </el-button>
           </el-badge>
         </div>
-      </el-header>
-      
-      <el-main v-if="tableValidated">
-        <!-- 当前订单状态显示 -->
+      </header>
+
+      <main class="app-main" v-if="tableValidated">
         <div v-if="currentOrderId !== null" class="order-status">
           <el-alert
             title="订单处理中"
@@ -26,8 +26,9 @@
             show-icon
           />
         </div>
-        
-        <el-tabs v-model="activeCategory" @tab-change="handleCategoryChange">
+
+        <el-card class="module-card">
+          <el-tabs v-model="activeCategory" @tab-change="handleCategoryChange">
           <!-- 所有菜品标签页 -->
           <el-tab-pane label="所有菜品" name="all">
             <div class="dish-grid">
@@ -151,14 +152,15 @@
               </el-card>
             </div>
           </el-tab-pane>
-        </el-tabs>
-      </el-main>
-      <el-main v-else>
+          </el-tabs>
+        </el-card>
+      </main>
+      <main class="app-main" v-else>
         <div class="loading-container">
           <el-skeleton :rows="6" animated />
         </div>
-      </el-main>
-    </el-container>
+      </main>
+    </div>
     
     <!-- 购物车抽屉 -->
     <el-drawer
@@ -488,41 +490,38 @@ onUnmounted(() => {
 
 <style scoped>
 .table-order {
-  min-height: 100vh;
-  background: #f5f7fa;
+  display: flex;
+  align-items: stretch;
 }
 
 .order-header {
-  background: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-bottom: none;
 }
 
 .header-left h2 {
   margin: 0;
-  color: #333;
 }
 
 .dish-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-  padding: 20px 0;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 8px 0 2px;
 }
 
 .dish-card {
   cursor: pointer;
-  transition: transform 0.2s;
+  border-radius: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .dish-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(33, 39, 41, 0.16);
 }
 
 .dish-card.out-of-stock {
-  opacity: 0.6;
+  opacity: 0.58;
 }
 
 .dish-image {
@@ -546,19 +545,19 @@ onUnmounted(() => {
 }
 
 .dish-info {
-  padding: 10px;
+  padding: 10px 4px 6px;
 }
 
 .dish-info h3 {
-  margin: 0 0 5px;
+  margin: 0 0 6px;
   font-size: 16px;
-  color: #333;
+  color: #20292c;
 }
 
 .dish-desc {
-  margin: 5px 0;
+  margin: 5px 0 8px;
   font-size: 12px;
-  color: #999;
+  color: #687679;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -574,7 +573,7 @@ onUnmounted(() => {
 .dish-price {
   font-size: 18px;
   font-weight: bold;
-  color: #f56c6c;
+  color: #bc4f14;
 }
 
 .cart-content {
@@ -600,7 +599,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(35, 43, 44, 0.12);
 }
 
 .item-info h4 {
@@ -610,7 +609,7 @@ onUnmounted(() => {
 
 .item-info p {
   margin: 0;
-  color: #666;
+  color: #637173;
   font-size: 12px;
 }
 
@@ -622,8 +621,8 @@ onUnmounted(() => {
 
 .cart-footer {
   padding: 20px;
-  border-top: 1px solid #eee;
-  background: #fff;
+  border-top: 1px solid rgba(35, 43, 44, 0.12);
+  background: rgba(253, 248, 240, 0.85);
 }
 
 .cart-total {
@@ -634,7 +633,7 @@ onUnmounted(() => {
 }
 
 .total-price {
-  color: #f56c6c;
+  color: #b84b12;
   font-weight: bold;
 }
 
@@ -647,13 +646,13 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid rgba(35, 43, 44, 0.08);
 }
 
 .order-total {
   font-size: 20px;
   font-weight: bold;
-  color: #f56c6c;
+  color: #b84b12;
 }
 
 .order-status {

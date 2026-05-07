@@ -58,3 +58,48 @@ cors:
     - http://localhost:3000
 server:
   port: 8082  # 修改为8082端口，避免冲突
+
+# 支付配置
+payment:
+  # 支付宝配置
+  alipay:
+    # 应用ID (在支付宝开放平台创建应用后获取)
+    app-id: "your_alipay_app_id"
+    # 应用私钥 (RSA2格式,使用支付宝密钥生成工具生成)
+    private-key: "your_alipay_private_key"
+    # 支付宝公钥 (在支付宝开放平台查看)
+    public-key: "your_alipay_public_key"
+    # 网关地址 (沙箱环境/正式环境)
+    gateway-url: "https://openapi.alipay.com/gateway.do"
+    # 异步通知URL (必须公网可访问)
+    notify-url: "http://your-domain.com/api/payment/notify/alipay"
+    # 同步跳转URL (用户支付完成后浏览器跳转地址)
+    return-url: "http://localhost:5173/payment/success"
+  
+  # 微信支付配置
+  wechat-pay:
+    # 公众号/小程序AppID
+    app-id: "your_wechat_app_id"
+    # 商户号
+    mch-id: "your_mch_id"
+    # 商户API密钥 (V2版本,在微信商户平台设置)
+    mch-key: "your_mch_key"
+    # API V3密钥 (用于V3接口)
+    api-v3-key: "your_api_v3_key"
+    # 商户证书序列号
+    cert-serial-no: "your_cert_serial_no"
+    # 商户私钥文件路径 (apiclient_key.pem)
+    private-key-path: "classpath:/cert/apiclient_key.pem"
+    # 商户证书文件路径 (apiclient_cert.pem)
+    private-cert-path: "classpath:/cert/apiclient_cert.pem"
+    # 微信支付回调通知URL (必须公网可访问)
+    notify-url: "http://your-domain.com/api/payment/notify/wechat"
+    # 交易类型 (NATIVE-扫码支付, JSAPI-公众号/小程序)
+    trade-type: "NATIVE"
+  
+  # 在线支付会话配置
+  online:
+    # 在线支付会话有效期（分钟）
+    session-expire-minutes: 15
+    # Mock主机地址(仅用于开发测试,生产环境应删除)
+    mock-host: "http://localhost:8082"

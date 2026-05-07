@@ -1,13 +1,17 @@
 <template>
-  <div class="kitchen-index">
-    <el-container>
-      <el-header class="kitchen-header">
-        <h1>后厨订单管理</h1>
-        <el-button type="danger" @click="handleLogout">退出登录</el-button>
-      </el-header>
-      
-      <el-main>
-        <el-tabs v-model="activeTab" @tab-change="handleTabChange">
+  <div class="app-page kitchen-index">
+    <div class="app-shell">
+      <header class="app-header kitchen-header">
+        <div>
+          <h1 class="app-title">后厨订单管理</h1>
+          <p class="app-subtitle">实时追踪待处理、制作中与已完成订单</p>
+        </div>
+        <el-button type="danger" plain @click="handleLogout">退出登录</el-button>
+      </header>
+
+      <main class="app-main">
+        <el-card class="module-card">
+          <el-tabs v-model="activeTab" @tab-change="handleTabChange">
           <el-tab-pane label="待处理" name="PENDING">
             <OrderList :orders="pendingOrders" @update-status="handleUpdateStatus" />
           </el-tab-pane>
@@ -17,15 +21,15 @@
           <el-tab-pane label="已完成" name="READY">
             <OrderList :orders="readyOrders" @update-status="handleUpdateStatus" />
           </el-tab-pane>
-        </el-tabs>
-      </el-main>
-    </el-container>
+          </el-tabs>
+        </el-card>
+      </main>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 import { getAllOrdersApi, updateOrderStatusApi } from '@/api/order'
@@ -33,7 +37,6 @@ import { connectWebSocket, disconnectWebSocket } from '@/utils/websocket'
 import type { OrderVO } from '@/types/api'
 import OrderList from './components/OrderList.vue'
 
-const router = useRouter()
 const userStore = useUserStore()
 
 const orders = ref<OrderVO[]>([])
@@ -100,21 +103,16 @@ onUnmounted(() => {
 
 <style scoped>
 .kitchen-index {
-  min-height: 100vh;
-  background: #f5f7fa;
+  display: flex;
+  align-items: stretch;
 }
 
 .kitchen-header {
-  background: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-bottom: none;
 }
 
 .kitchen-header h1 {
   margin: 0;
-  color: #333;
 }
 </style>
 

@@ -146,6 +146,29 @@ export interface PaymentDTO {
   cashierId?: number
 }
 
+export interface OnlinePaymentVO {
+  paymentNo: string
+  orderId: number
+  orderNumber: string
+  tableNumber: string
+  paymentMethod: string
+  amount: number
+  qrCodeContent: string
+  status: 'CREATED' | 'SUCCESS' | 'EXPIRED' | 'NOT_FOUND'
+  createTime: string
+  expireTime: string
+}
+
+export interface OnlinePaymentStatusVO {
+  paymentNo: string
+  orderId: number
+  paymentMethod: string
+  amount: number
+  paymentStatus: 'CREATED' | 'SUCCESS' | 'EXPIRED' | 'NOT_FOUND'
+  expireTime?: string
+  paidTime?: string
+}
+
 // 桌号相关
 export interface Table {
   id: number

@@ -1,24 +1,34 @@
 <template>
-  <div class="cashier-index">
-    <el-container>
-      <el-header class="cashier-header">
-        <h1>收银管理</h1>
-        <div class="header-actions">
-          <el-button type="danger" @click="handleLogout">退出登录</el-button>
+  <div class="app-page cashier-index">
+    <div class="app-shell">
+      <header class="app-header cashier-header">
+        <div>
+          <h1 class="app-title">收银管理</h1>
+          <p class="app-subtitle">快速完成结账并维护会员信息</p>
         </div>
-      </el-header>
-      
-      <el-main>
-        <el-tabs v-model="activeTab">
+        <div class="header-actions">
+          <el-button type="danger" plain @click="handleLogout">退出登录</el-button>
+        </div>
+      </header>
+
+      <main class="app-main">
+        <el-card class="module-card">
+          <el-tabs v-model="activeTab">
           <el-tab-pane label="待结账订单" name="orders">
-            <OrderList :orders="readyOrders" @pay="handlePay" />
+            <OrderList
+              :orders="readyOrders"
+              :cashier-id="userStore.userId || undefined"
+              @pay="handlePay"
+              @paid="loadOrders"
+            />
           </el-tab-pane>
           <el-tab-pane label="会员管理" name="members">
             <MemberManagement />
           </el-tab-pane>
-        </el-tabs>
-      </el-main>
-    </el-container>
+          </el-tabs>
+        </el-card>
+      </main>
+    </div>
   </div>
 </template>
 
@@ -96,21 +106,16 @@ onUnmounted(() => {
 
 <style scoped>
 .cashier-index {
-  min-height: 100vh;
-  background: #f5f7fa;
+  display: flex;
+  align-items: stretch;
 }
 
 .cashier-header {
-  background: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-bottom: none;
 }
 
 .cashier-header h1 {
   margin: 0;
-  color: #333;
 }
 </style>
 

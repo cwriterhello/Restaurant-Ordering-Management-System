@@ -84,7 +84,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { getDishesApi, getAllDishesApi, createDishApi, updateDishApi, updateDishStatusApi, deleteDishApi } from '@/api/dish'
+import { getAllDishesApi, createDishApi, updateDishApi, updateDishStatusApi, deleteDishApi } from '@/api/dish'
 import { getCategoriesApi } from '@/api/category'
 import type { DishVO, DishDTO, Category } from '@/types/api'
 
@@ -223,7 +223,7 @@ onMounted(() => {
 
 <style scoped>
 .dish-management {
-  padding: 20px;
+  padding: 8px 0 0;
 }
 
 .card-header {

@@ -50,18 +50,21 @@
           <div class="order-actions">
             <el-button
               type="success"
+              :loading="submittingOrderId === order.id && submittingMethod === 'CASH'"
               @click="handlePay(order.id, 'CASH')"
             >
               现金支付
             </el-button>
             <el-button
               type="primary"
+              :loading="submittingOrderId === order.id && submittingMethod === 'ALIPAY'"
               @click="handlePay(order.id, 'ALIPAY')"
             >
               支付宝
             </el-button>
             <el-button
               type="warning"
+              :loading="submittingOrderId === order.id && submittingMethod === 'WECHAT'"
               @click="handlePay(order.id, 'WECHAT')"
             >
               微信支付
@@ -70,58 +73,218 @@
         </div>
       </el-card>
     </div>
+
+    <el-dialog
+      v-model="onlinePayVisible"
+      :title="`${methodMap[selectedMethod]}收款`"
+      width="420px"
+      destroy-on-close
+      @close="closeOnlinePaymentDialog"
+    >
+      <div v-if="selectedOrder" class="online-pay-content">
+        <div class="pay-header">
+          <p>订单号：{{ selectedOrder.orderNumber }}</p>
+          <p>桌号：{{ selectedOrder.tableNumber }}</p>
+          <p class="pay-amount">应收金额：¥{{ selectedOrder.actualAmount.toFixed(2) }}</p>
+          <p>支付单号：{{ onlinePaymentNo }}</p>
+          <p>有效期至：{{ onlinePaymentExpireText }}</p>
+        </div>
+
+        <div class="qr-box">
+          <qrcode-vue :value="qrCodeValue" :size="180" level="M" />
+        </div>
+
+        <p class="pay-hint">
+          请使用{{ methodMap[selectedMethod] }}扫码付款，顾客完成付款后点击“确认已支付”。
+        </p>
+      </div>
+      <template #footer>
+        <el-button @click="closeOnlinePaymentDialog">取消</el-button>
+        <el-button
+          type="primary"
+          :loading="confirmingOnlinePay"
+          @click="confirmOnlinePay"
+        >
+          确认已支付
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElMessageBox } from 'element-plus'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import QrcodeVue from 'qrcode.vue'
 import type { OrderVO } from '@/types/api'
+import { confirmOnlinePaymentApi, createOnlinePaymentApi, getOnlinePaymentStatusApi } from '@/api/order'
+
+type PaymentMethod = 'CASH' | 'ALIPAY' | 'WECHAT'
 
 const props = defineProps<{
   orders: OrderVO[]
+  cashierId?: number
 }>()
 
 const emit = defineEmits<{
-  pay: [orderId: number, paymentMethod: string]
+  pay: [orderId: number, paymentMethod: PaymentMethod]
+  paid: []
 }>()
+
+const onlinePayVisible = ref(false)
+const selectedMethod = ref<PaymentMethod>('ALIPAY')
+const selectedOrder = ref<OrderVO | null>(null)
+const confirmingOnlinePay = ref(false)
+const submittingOrderId = ref<number | null>(null)
+const submittingMethod = ref<PaymentMethod | null>(null)
+const onlinePaymentNo = ref('')
+const onlinePaymentExpireTime = ref('')
+const qrCodeValue = ref('')
+const statusPollingTimer = ref<number | null>(null)
+
+const methodMap: Record<PaymentMethod, string> = {
+  CASH: '现金',
+  ALIPAY: '支付宝',
+  WECHAT: '微信支付'
+}
+
+const onlinePaymentExpireText = computed(() =>
+  onlinePaymentExpireTime.value ? formatTime(onlinePaymentExpireTime.value) : '--'
+)
 
 const formatTime = (time: string) => {
   return new Date(time).toLocaleString('zh-CN')
 }
 
-const handlePay = (orderId: number, paymentMethod: string) => {
-  const methodMap: Record<string, string> = {
-    'CASH': '现金',
-    'ALIPAY': '支付宝',
-    'WECHAT': '微信支付'
+const handlePay = async (orderId: number, paymentMethod: PaymentMethod) => {
+  if (paymentMethod === 'CASH') {
+    ElMessageBox.confirm(
+      `确认使用${methodMap[paymentMethod]}支付？`,
+      '确认支付',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }
+    ).then(() => {
+      emit('pay', orderId, paymentMethod)
+    }).catch(() => {})
+    return
   }
-  
-  ElMessageBox.confirm(
-    `确认使用${methodMap[paymentMethod]}支付？`,
-    '确认支付',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(() => {
-    emit('pay', orderId, paymentMethod)
-  }).catch(() => {})
+
+  const order = props.orders.find(item => item.id === orderId)
+  if (!order) {
+    ElMessage.error('订单不存在或已更新，请刷新后重试')
+    return
+  }
+  submittingOrderId.value = orderId
+  submittingMethod.value = paymentMethod
+  try {
+    const res = await createOnlinePaymentApi(orderId, {
+      paymentMethod,
+      cashierId: props.cashierId
+    })
+    selectedMethod.value = paymentMethod
+    selectedOrder.value = order
+    onlinePaymentNo.value = res.data.paymentNo
+    onlinePaymentExpireTime.value = res.data.expireTime
+    qrCodeValue.value = res.data.qrCodeContent
+    onlinePayVisible.value = true
+  } catch (error: any) {
+    ElMessage.error(error.message || '创建在线支付单失败')
+  } finally {
+    submittingOrderId.value = null
+    submittingMethod.value = null
+  }
 }
+
+const confirmOnlinePay = async () => {
+  if (!selectedOrder.value || !onlinePaymentNo.value) {
+    return
+  }
+  confirmingOnlinePay.value = true
+  try {
+    await confirmOnlinePaymentApi(selectedOrder.value.id, onlinePaymentNo.value, {
+      cashierId: props.cashierId
+    })
+    ElMessage.success('支付确认成功')
+    closeOnlinePaymentDialog()
+    emit('paid')
+  } catch (error: any) {
+    ElMessage.error(error.message || '在线支付确认失败')
+  } finally {
+    confirmingOnlinePay.value = false
+  }
+}
+
+const checkOnlinePaymentStatus = async () => {
+  if (!selectedOrder.value || !onlinePaymentNo.value) {
+    return
+  }
+  try {
+    const res = await getOnlinePaymentStatusApi(selectedOrder.value.id, onlinePaymentNo.value)
+    if (res.data.paymentStatus === 'SUCCESS') {
+      ElMessage.success('系统检测到支付已完成')
+      closeOnlinePaymentDialog()
+      emit('paid')
+    } else if (res.data.paymentStatus === 'EXPIRED') {
+      ElMessage.warning('支付单已过期，请重新发起支付')
+      closeOnlinePaymentDialog()
+    }
+  } catch (error) {
+    // 轮询接口失败时保持静默，避免频繁打断收银操作
+  }
+}
+
+const startStatusPolling = () => {
+  stopStatusPolling()
+  statusPollingTimer.value = window.setInterval(() => {
+    checkOnlinePaymentStatus()
+  }, 3000)
+}
+
+const stopStatusPolling = () => {
+  if (statusPollingTimer.value !== null) {
+    window.clearInterval(statusPollingTimer.value)
+    statusPollingTimer.value = null
+  }
+}
+
+const closeOnlinePaymentDialog = () => {
+  onlinePayVisible.value = false
+  selectedOrder.value = null
+  onlinePaymentNo.value = ''
+  onlinePaymentExpireTime.value = ''
+  qrCodeValue.value = ''
+  stopStatusPolling()
+}
+
+watch(onlinePayVisible, (visible) => {
+  if (visible) {
+    startStatusPolling()
+  } else {
+    stopStatusPolling()
+  }
+})
+
+onBeforeUnmount(() => {
+  stopStatusPolling()
+})
 </script>
 
 <style scoped>
 .order-list {
-  padding: 20px;
+  padding: 8px 0 0;
 }
 
 .orders-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 14px;
 }
 
 .order-card {
+  border-radius: 14px;
   transition: transform 0.2s;
 }
 
@@ -141,7 +304,7 @@ const handlePay = (orderId: number, paymentMethod: string) => {
 
 .order-time {
   font-size: 12px;
-  color: #999;
+  color: #707f82;
 }
 
 .order-content {
@@ -160,8 +323,8 @@ const handlePay = (orderId: number, paymentMethod: string) => {
 .order-items {
   margin: 15px 0;
   padding: 10px;
-  background: #f5f7fa;
-  border-radius: 4px;
+  background: rgba(247, 240, 230, 0.7);
+  border-radius: 10px;
 }
 
 .order-item {
@@ -174,8 +337,8 @@ const handlePay = (orderId: number, paymentMethod: string) => {
 .order-summary {
   margin: 15px 0;
   padding: 15px;
-  background: #f9f9f9;
-  border-radius: 4px;
+  background: rgba(247, 240, 230, 0.55);
+  border-radius: 10px;
 }
 
 .summary-row {
@@ -188,7 +351,7 @@ const handlePay = (orderId: number, paymentMethod: string) => {
 .summary-row.total {
   margin-top: 10px;
   padding-top: 10px;
-  border-top: 2px solid #eee;
+  border-top: 1px solid rgba(35, 43, 44, 0.12);
   font-size: 16px;
   font-weight: bold;
 }
@@ -198,7 +361,7 @@ const handlePay = (orderId: number, paymentMethod: string) => {
 }
 
 .total-amount {
-  color: #f56c6c;
+  color: #b94d12;
   font-size: 20px;
 }
 
@@ -210,6 +373,38 @@ const handlePay = (orderId: number, paymentMethod: string) => {
 
 .order-actions .el-button {
   flex: 1;
+}
+
+.online-pay-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pay-header p {
+  margin: 0 0 6px;
+  color: #5f6d71;
+}
+
+.pay-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #b94d12 !important;
+}
+
+.qr-box {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+  background: rgba(247, 240, 230, 0.7);
+  border-radius: 12px;
+}
+
+.pay-hint {
+  margin: 0;
+  color: #6b797d;
+  line-height: 1.6;
+  font-size: 13px;
 }
 </style>
 

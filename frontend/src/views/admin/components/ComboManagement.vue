@@ -59,72 +59,6 @@
       width="800px"
       @close="handleCancel"
     >
-    
-    <!-- 套餐详情对话框 -->
-    <el-dialog
-      v-model="showDetailDialog"
-      title="套餐详情"
-      width="800px"
-    >
-      <div class="detail-content">
-        <div class="detail-row">
-          <span class="label">套餐名称：</span>
-          <span class="value">{{ currentCombo?.name }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">描述：</span>
-          <span class="value">{{ currentCombo?.description || '-' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">价格：</span>
-          <span class="value">¥{{ currentCombo?.price.toFixed(2) }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">原价：</span>
-          <span class="value" v-if="currentCombo?.originalPrice && currentCombo.originalPrice > 0">¥{{ currentCombo.originalPrice.toFixed(2) }}</span>
-          <span class="value" v-else>-</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">状态：</span>
-          <span class="value">
-            <el-tag :type="currentCombo?.isAvailable === 1 ? 'success' : 'danger'">
-              {{ currentCombo?.isAvailable === 1 ? '上架' : '下架' }}
-            </el-tag>
-          </span>
-        </div>
-        <div class="detail-row">
-          <span class="label">排序：</span>
-          <span class="value">{{ currentCombo?.sortOrder }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">创建时间：</span>
-          <span class="value">{{ currentCombo?.createTime }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">更新时间：</span>
-          <span class="value">{{ currentCombo?.updateTime }}</span>
-        </div>
-        
-        <h4 style="margin: 20px 0 10px;">包含菜品：</h4>
-        <el-table :data="currentCombo?.dishes || []" style="width: 100%" v-if="showDetailDialog" :key="currentCombo?.id">
-          <el-table-column prop="dishName" label="菜品名称" />
-          <el-table-column prop="quantity" label="数量" />
-          <el-table-column label="单价">
-            <template #default="{ row }">
-              ¥{{ getDishPrice(row.dishId).toFixed(2) }}
-            </template>
-          </el-table-column>
-          <el-table-column label="小计">
-            <template #default="{ row }">
-              ¥{{ (getDishPrice(row.dishId) * row.quantity).toFixed(2) }}
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <template #footer>
-        <el-button @click="showDetailDialog = false">关闭</el-button>
-      </template>
-    </el-dialog>
       <el-form :model="comboForm" :rules="comboRules" ref="comboFormRef" label-width="100px">
         <el-form-item label="套餐名称" prop="name">
           <el-input v-model="comboForm.name" placeholder="请输入套餐名称" />
@@ -213,14 +147,80 @@
       </template>
     </el-dialog>
 
+    <!-- 套餐详情对话框 -->
+    <el-dialog
+      v-model="showDetailDialog"
+      title="套餐详情"
+      width="800px"
+    >
+      <div class="detail-content">
+        <div class="detail-row">
+          <span class="label">套餐名称：</span>
+          <span class="value">{{ currentCombo?.name }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">描述：</span>
+          <span class="value">{{ currentCombo?.description || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">价格：</span>
+          <span class="value">¥{{ currentCombo?.price.toFixed(2) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">原价：</span>
+          <span class="value" v-if="currentCombo?.originalPrice && currentCombo.originalPrice > 0">¥{{ currentCombo.originalPrice.toFixed(2) }}</span>
+          <span class="value" v-else>-</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">状态：</span>
+          <span class="value">
+            <el-tag :type="currentCombo?.isAvailable === 1 ? 'success' : 'danger'">
+              {{ currentCombo?.isAvailable === 1 ? '上架' : '下架' }}
+            </el-tag>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">排序：</span>
+          <span class="value">{{ currentCombo?.sortOrder }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">创建时间：</span>
+          <span class="value">{{ currentCombo?.createTime }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">更新时间：</span>
+          <span class="value">{{ currentCombo?.updateTime }}</span>
+        </div>
+
+        <h4 style="margin: 20px 0 10px;">包含菜品：</h4>
+        <el-table :data="currentCombo?.dishes || []" style="width: 100%" v-if="showDetailDialog" :key="currentCombo?.id">
+          <el-table-column prop="dishName" label="菜品名称" />
+          <el-table-column prop="quantity" label="数量" />
+          <el-table-column label="单价">
+            <template #default="{ row }">
+              ¥{{ getDishPrice(row.dishId).toFixed(2) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="小计">
+            <template #default="{ row }">
+              ¥{{ (getDishPrice(row.dishId) * row.quantity).toFixed(2) }}
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <template #footer>
+        <el-button @click="showDetailDialog = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
 
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, watch, nextTick } from 'vue'
+import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import { ElMessage, ElMessageBox, FormInstance, FormRules } from 'element-plus'
-import { getCombosApi, getComboByIdApi, createComboApi, updateComboApi, updateComboStatusApi, deleteComboApi, configureComboDishesApi, getCombosWithDishesApi } from '@/api/combo'
+import { getCombosApi, getComboByIdApi, createComboApi, updateComboApi, updateComboStatusApi, deleteComboApi, configureComboDishesApi } from '@/api/combo'
 import { getDishesApi } from '@/api/dish'
 import type { Combo, ComboVO, DishVO } from '@/types/api'
 
@@ -253,8 +253,6 @@ const comboRules = reactive<FormRules<Combo>>({
   name: [{ required: true, message: '请输入套餐名称', trigger: 'blur' }],
   price: [{ required: true, message: '请输入价格', trigger: 'blur' }]
 })
-
-const dialogTitle = computed(() => isEdit.value ? '编辑套餐' : '新增套餐')
 
 const loadCombos = async () => {
   try {
@@ -596,7 +594,7 @@ onMounted(() => {
 
 <style scoped>
 .combo-management {
-  padding: 20px;
+  padding: 8px 0 0;
 }
 
 .card-header {
@@ -606,7 +604,7 @@ onMounted(() => {
 }
 
 .detail-content {
-  padding: 10px 20px;
+  padding: 10px 8px;
 }
 
 .detail-row {
@@ -617,12 +615,12 @@ onMounted(() => {
 .label {
   width: 100px;
   font-weight: bold;
-  color: #666;
+  color: #5d6b6f;
 }
 
 .value {
   flex: 1;
-  color: #333;
+  color: #1f272a;
 }
 
 

@@ -114,11 +114,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { useUserStore } from '@/stores/user'
 import { getAllUsersApi, createUserApi, updateUserApi, deleteUserApi, resetUserPasswordApi } from '@/api/user'
 import type { User } from '@/types/api'
-
-const userStore = useUserStore()
 
 // 用户列表相关
 const users = ref<User[]>([])
@@ -333,7 +330,7 @@ onMounted(() => {
 
 <style scoped>
 .user-management {
-  padding: 20px;
+  padding: 8px 0 0;
 }
 .card-header {
   display: flex;

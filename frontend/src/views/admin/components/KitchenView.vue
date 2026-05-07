@@ -82,8 +82,6 @@ onUnmounted(() => {
 
 <style scoped>
 .kitchen-view {
-  background: #fff;
-  border-radius: 4px;
-  padding: 20px;
+  padding: 8px 0 0;
 }
 </style>

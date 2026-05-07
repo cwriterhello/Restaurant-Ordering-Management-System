@@ -1,6 +1,6 @@
 <template>
-  <div class="admin-index">
-    <el-container style="height: 100vh">
+  <div class="app-page admin-index">
+    <el-container class="app-shell admin-shell">
       <!-- 左侧菜单栏 -->
       <el-aside width="220px" class="admin-aside">
         <div class="logo-box">
@@ -10,9 +10,9 @@
             :default-active="activeMenu"
             class="admin-menu"
             @select="handleMenuSelect"
-            background-color="#1e293b"
-            text-color="#f1f5f9"
-            active-text-color="#38bdf8"
+            background-color="#1f2425"
+            text-color="#f4efe7"
+            active-text-color="#f1a066"
         >
           <el-menu-item index="kitchen">
             <el-icon><Monitor /></el-icon>
@@ -47,7 +47,8 @@
       <el-container>
         <el-header class="admin-header">
           <div class="header-left">
-            <h3>{{ currentTitle }}</h3>
+            <h3 class="app-title">{{ currentTitle }}</h3>
+            <p class="app-subtitle">统一管理后厨、收银与业务数据</p>
           </div>
           <div class="header-right">
             <el-badge type="success" :value="getRoleText(userStore.role)" />
@@ -92,7 +93,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { Monitor, Money, Shop, Setting, Lock } from '@element-plus/icons-vue'
 import DishManagement from './components/DishManagement.vue'
@@ -104,7 +104,6 @@ import Statistics from './components/Statistics.vue'
 import KitchenView from '../kitchen/Index.vue'
 import CashierView from '../cashier/Index.vue'
 
-const router = useRouter()
 const userStore = useUserStore()
 
 const activeMenu = ref('kitchen')
@@ -144,14 +143,17 @@ const handleLogout = () => {
 <style scoped>
 /* 整体布局 */
 .admin-index {
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  display: flex;
+  align-items: stretch;
 }
 
-/* 左侧深色侧边栏（高级、护眼） */
+.admin-shell {
+  width: 100%;
+  min-height: calc(100vh - clamp(28px, 4vw, 48px));
+}
+
 .admin-aside {
-  background: #1e293b;
+  background: #1f2425;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -160,12 +162,12 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .logo-box h2 {
   margin: 0;
-  color: #f1f5f9;
+  color: #f7efe2;
   font-size: 18px;
   font-weight: 600;
   letter-spacing: 1px;
@@ -177,9 +179,8 @@ const handleLogout = () => {
   overflow-y: auto;
 }
 
-/* 顶部导航栏 */
 .admin-header {
-  background: #ffffff;
+  background: linear-gradient(120deg, rgba(255, 251, 246, 0.88), rgba(248, 239, 226, 0.84));
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -192,9 +193,11 @@ const handleLogout = () => {
 
 .header-left h3 {
   margin: 0;
-  color: #1e293b;
-  font-size: 17px;
-  font-weight: 600;
+  font-size: clamp(24px, 2.2vw, 32px);
+}
+
+.header-left .app-subtitle {
+  margin-top: 4px;
 }
 
 .header-right {
@@ -205,13 +208,12 @@ const handleLogout = () => {
 
 .user-name {
   font-size: 14px;
-  color: #475569;
+  color: #47575b;
   font-weight: 500;
 }
 
-/* 内容区域（柔和、卡片感） */
 .admin-main {
-  background: #f8fafc;
+  background: transparent;
   padding: 0;
   overflow: auto;
 }
@@ -221,13 +223,12 @@ const handleLogout = () => {
   min-height: calc(100vh - 64px);
 }
 
-/* 滚动条美化 */
 :deep(.admin-menu::-webkit-scrollbar) {
   width: 4px;
 }
 
 :deep(.admin-menu::-webkit-scrollbar-thumb) {
-  background: #475569;
+  background: rgba(250, 230, 207, 0.38);
   border-radius: 4px;
 }
 </style>

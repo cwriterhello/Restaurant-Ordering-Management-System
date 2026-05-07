@@ -2,7 +2,12 @@
   <div class="cashier-view">
     <el-tabs v-model="activeTab">
       <el-tab-pane label="待结账订单" name="orders">
-        <OrderList :orders="readyOrders" @pay="handlePay" />
+        <OrderList
+          :orders="readyOrders"
+          :cashier-id="userStore.userId || undefined"
+          @pay="handlePay"
+          @paid="loadOrders"
+        />
       </el-tab-pane>
       <el-tab-pane label="会员管理" name="members">
         <MemberManagement />
@@ -79,8 +84,6 @@ onUnmounted(() => {
 
 <style scoped>
 .cashier-view {
-  background: #fff;
-  border-radius: 4px;
-  padding: 20px;
+  padding: 8px 0 0;
 }
 </style>

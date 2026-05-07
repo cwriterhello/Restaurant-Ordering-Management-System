@@ -71,7 +71,7 @@
 import { ElMessageBox } from 'element-plus'
 import type { OrderVO } from '@/types/api'
 
-const props = defineProps<{
+defineProps<{
   orders: OrderVO[]
 }>()
 
@@ -129,16 +129,17 @@ const handleStatusChange = (orderId: number, status: string) => {
 
 <style scoped>
 .order-list {
-  padding: 20px;
+  padding: 8px 0 0;
 }
 
 .orders-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 14px;
 }
 
 .order-card {
+  border-radius: 14px;
   transition: transform 0.2s;
 }
 
@@ -159,7 +160,7 @@ const handleStatusChange = (orderId: number, status: string) => {
 
 .order-time {
   font-size: 12px;
-  color: #999;
+  color: #707f82;
 }
 
 .order-content {
@@ -178,8 +179,8 @@ const handleStatusChange = (orderId: number, status: string) => {
 .order-items {
   margin: 15px 0;
   padding: 10px;
-  background: #f5f7fa;
-  border-radius: 4px;
+  background: rgba(247, 240, 230, 0.7);
+  border-radius: 10px;
 }
 
 .order-item {
@@ -195,7 +196,7 @@ const handleStatusChange = (orderId: number, status: string) => {
   align-items: center;
   margin-top: 15px;
   padding-top: 15px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid rgba(35, 43, 44, 0.1);
 }
 
 .order-total {
@@ -205,7 +206,7 @@ const handleStatusChange = (orderId: number, status: string) => {
 .total-amount {
   font-size: 20px;
   font-weight: bold;
-  color: #f56c6c;
+  color: #b94d12;
   margin-left: 10px;
 }
 

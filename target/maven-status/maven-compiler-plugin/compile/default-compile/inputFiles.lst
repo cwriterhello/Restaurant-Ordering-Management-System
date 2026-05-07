@@ -4,6 +4,7 @@ C:\dev\aaa\demo\src\main\java\com\example\demo\config\GlobalExceptionHandler.jav
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\MyBatisPlusConfig.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\MyMetaObjectHandler.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\OpenApiConfig.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\config\PaymentProperties.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\RedisConfig.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\SecurityConfig.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\config\WebConfig.java
@@ -14,6 +15,7 @@ C:\dev\aaa\demo\src\main\java\com\example\demo\controller\ComboController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\DishController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\MemberController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\OrderController.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\controller\PaymentNotifyController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\StatisticsController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\TableController.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\controller\UserController.java
@@ -25,6 +27,8 @@ C:\dev\aaa\demo\src\main\java\com\example\demo\dto\CreateOrderRequest.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\DishDTO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\LoginRequest.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\LoginResponse.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\dto\OnlinePaymentConfirmDTO.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\dto\OnlinePaymentSession.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\OrderStatusUpdateDTO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\PaymentDTO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\dto\TableDTO.java
@@ -50,6 +54,7 @@ C:\dev\aaa\demo\src\main\java\com\example\demo\mapper\OrderMapper.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\mapper\StockAlertMapper.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\mapper\TableMapper.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\mapper\UserMapper.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\service\AlipayService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\AuthService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\CategoryService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\ComboService.java
@@ -59,12 +64,15 @@ C:\dev\aaa\demo\src\main\java\com\example\demo\service\OrderService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\RedisService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\UserService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\service\WebSocketService.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\service\WechatPayService.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\util\BeanUtil.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\util\JwtUtil.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\vo\ComboVO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\vo\DailyStatisticsVO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\vo\DishVO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\vo\MemberVO.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\vo\OnlinePaymentStatusVO.java
+C:\dev\aaa\demo\src\main\java\com\example\demo\vo\OnlinePaymentVO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\vo\OrderItemVO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\vo\OrderVO.java
 C:\dev\aaa\demo\src\main\java\com\example\demo\vo\StockAlertVO.java
